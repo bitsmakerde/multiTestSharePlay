@@ -28,32 +28,55 @@ struct ImmersiveView: View {
                 
                 // get manipulation events for moveing the entity
                 _ = content.subscribe(to: ManipulationEvents.WillBegin.self) { event in
-                    print("update begin\(event.entity.transform.translation)")
-                    print("\(event.entity.name)")
-                    appModel.send(modelId: event.entity.id, position: event.entity.transform.translation)
+                    appModel.send(
+                        modelId: event.entity.id,
+                        position: event.entity.transform.translation,
+                        scale: event.entity.scale
+                    )
                 }
                 _ = content.subscribe(to: ManipulationEvents.DidUpdateTransform.self) { event in
-                    print("update DidUpdateTransform\(event.entity.transform.translation)")
-                    appModel.send(modelId: event.entity.id, position: event.entity.transform.translation)
+                    appModel.send(
+                        modelId: appModel.modelEnitities[0].modelId,
+                        position: event.entity.transform.translation,
+                        scale: event.entity.scale
+                    )
                 }
                 
                 _ = content.subscribe(to: ManipulationEvents.WillEnd.self) { event in
-                    print("update WillEnd\(event.entity.transform.translation)")
-                    appModel.send(modelId: event.entity.id, position: event.entity.transform.translation)
+                    appModel.send(
+                        modelId: appModel.modelEnitities[0].modelId,
+                        position: event.entity.transform.translation,
+                        scale: event.entity.scale
+                    )
                 }
                 
 #endif
                 content.add(immersiveContentEntity)
+                let sharedModel = SharedModel(modelId: 1, enitity: immersiveContentEntity)
+                appModel.modelEnitities.append(sharedModel)
             } catch {
                 print("Error loading entity: \(error)")
             }
-        }.gesture(TapGesture(count: 1).targetedToAnyEntity()
-            .onEnded({ value in
-                print("tapped on entity: \(value.entity.name)")
-                value.entity.transform = Transform(scale: SIMD3<Float>(2.0, 2.0, 2.0))
-                appModel.send(modelId: value.entity.id, position: value.entity.position)
+        }
+//        .gesture(TapGesture(count: 1).targetedToAnyEntity()
+//            .onEnded { value in
+//                value.entity.transform = Transform(scale: SIMD3<Float>(2.0, 2.0, 2.0))
+//                appModel.send(modelId: appModel.modelEnitities[0].modelId, position: value.entity.position, scale: value.entity.scale)
+//            }
+//        )
+        .gesture(DragGesture(minimumDistance: 0).targetedToAnyEntity()
+            .onChanged { value in
+                let currentPosition = value.entity.position
+                print("currentPosition: \(currentPosition)")
+                print("value.translation: \(value.translation.width), heigt: \(value.translation.height)")
+                let newPosition = SIMD3<Float>(
+                    currentPosition.x + Float(value.translation.width) * 0.01,
+                    currentPosition.y - Float(value.translation.height) * 0.01,
+                    currentPosition.z
+                )
+                value.entity.position = newPosition
+                appModel.send(modelId: appModel.modelEnitities[0].modelId, position: newPosition, scale: value.entity.scale)
             })
-        )
     }
 }
 

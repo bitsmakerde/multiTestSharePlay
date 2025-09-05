@@ -27,7 +27,7 @@ class AppModel {
     var isLocked: Bool = false
     var groupSession: GroupSession<SharedActivity>?
     var groupSessionMessenger: GroupSessionMessenger?
-    var modelEnitities: [ModelEntity] = []
+    var modelEnitities: [SharedModel] = []
 }
 
 /// Monitor for new Guess Together group activity sessions.

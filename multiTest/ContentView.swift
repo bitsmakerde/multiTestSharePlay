@@ -41,6 +41,10 @@ struct ContentView: View {
                     }) {
                         Text("Start session")
                     }
+                } else if appModel.groupSession != nil {
+                    Text("You are in a session")
+                } else {
+                    Text("Not eligible for group session")
                 }
             }
             #endif
