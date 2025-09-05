@@ -5,20 +5,15 @@
 //  Created by Bongartz, Andre (N/FI-N2) on 05.08.25.
 //
 
-import SwiftUI
-internal import Combine
+import Combine
 import GroupActivities
 import RealityKit
+import SwiftUI
 
 /// Maintains app-wide state
 @MainActor
 @Observable
 class AppModel {
-#if os(visionOS)
-    var content: RealityViewContent?
-#else
-    var content: RealityViewCameraContent?
-#endif
     let immersiveSpaceID = "ImmersiveSpace"
     enum ImmersiveSpaceState {
         case closed
@@ -37,6 +32,18 @@ class AppModel {
 
 /// Monitor for new Guess Together group activity sessions.
 extension AppModel {
+    func startShareSession() {
+        Task {
+            do {
+                let activity = SharedActivity()
+                _ = try await activity.activate()
+                // The session will be automatically detected by our listener
+            } catch {
+                print("Failed to start SharePlay: \(error)")
+            }
+        }
+    }
+
     @Sendable
     func observeGroupSessions() async {
         for await session in SharedActivity.sessions() {

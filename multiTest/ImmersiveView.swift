@@ -17,7 +17,9 @@ struct ImmersiveView: View {
                 let immersiveContentEntity = try await Entity(named: "toy_car")
                 immersiveContentEntity.components.set(InputTargetComponent())
                 immersiveContentEntity.generateCollisionShapes(recursive: true)
+                
 #if os(visionOS)
+                immersiveContentEntity.position = SIMD3(x: 0, y: 0, z: -2)
                 ManipulationComponent.configureEntity(immersiveContentEntity)
                 var mc = ManipulationComponent()
                 mc.releaseBehavior = .stay
