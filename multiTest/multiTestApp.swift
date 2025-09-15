@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct multiTestApp: App {
     @State private var appModel = AppModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(appModel)
         }
+        
 #if os(visionOS)
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             ImmersiveView()
